@@ -20,7 +20,7 @@ function expandSeeds(seeds) {
 
     expandedSeeds.push({
       start: seeds[idx],
-      end: Math.floor(endValue / 2),
+      end: endValue,
     });
 
     idx += 2;
@@ -66,9 +66,14 @@ function findLowestLocation(inputData) {
   console.log("Seeds:", expandedSeeds);
   const allMaps = buildsAllRangeLists(inputData.slice(2));
   let lowestLocation = Number.MAX_SAFE_INTEGER;
-  for (const seedObj of expandedSeeds) {
+  const trimmedSeeds = [expandSeeds[0]];
+  console.log("Trimmed seeds: ", trimmedSeeds);
+  for (const seedObj of trimmedSeeds) {
     let seed = seedObj.start;
-    let maxTries = 250_0000;
+    console.log("Current range: ", seedObj);
+    let currentLowest = Number.MAX_SAFE_INTEGER;
+    let range = seedObj.end - seedObj.start + 1;
+    let skipper = Math.floor(Math.sqrt(range));
     while (seed <= seedObj.end) {
       let mapId = 0;
       let value = seed;
@@ -84,11 +89,13 @@ function findLowestLocation(inputData) {
 
         mapId += 1;
       }
-      seed += 1;
-      maxTries -= 1;
+      seed += skipper;
       lowestLocation = Math.min(lowestLocation, value);
+      currentLowest = Math.min(currentLowest, value);
       // console.log("Seed:", seed, "Location:", value);
     }
+
+    console.log("For this range lowest was: ", currentLowest);
   }
 
   return lowestLocation;
