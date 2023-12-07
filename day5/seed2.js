@@ -1,6 +1,10 @@
 const path = require("path");
 const { readInput, convertInputToList } = require("../utils/data");
 
+/**
+ * For part two, I realised that looking at every possible seed value would take a ridiculous amount of time. So instead of looking at every seed, I instead looked at every nth seed, where n was the square root of the range, which gave me an approximate answer. I then found which seed this approximate answer was from, and what the preceding seed was, and checked over that range for the true answer.
+ */
+
 const RANGE_MAPS_NAMESPACE = [
   "seedToSoil",
   "soilToFertilizer",
@@ -66,14 +70,13 @@ function findLowestLocation(inputData) {
   console.log("Seeds:", expandedSeeds);
   const allMaps = buildsAllRangeLists(inputData.slice(2));
   let lowestLocation = Number.MAX_SAFE_INTEGER;
-  const trimmedSeeds = [expandSeeds[0]];
-  console.log("Trimmed seeds: ", trimmedSeeds);
+  const trimmedSeeds = [expandedSeeds[1]];
   for (const seedObj of trimmedSeeds) {
     let seed = seedObj.start;
     console.log("Current range: ", seedObj);
     let currentLowest = Number.MAX_SAFE_INTEGER;
-    let range = seedObj.end - seedObj.start + 1;
-    let skipper = Math.floor(Math.sqrt(range));
+    // let range = seedObj.end - seedObj.start + 1;
+    // let skipper = Math.floor(Math.sqrt(range));
     while (seed <= seedObj.end) {
       let mapId = 0;
       let value = seed;
@@ -89,7 +92,7 @@ function findLowestLocation(inputData) {
 
         mapId += 1;
       }
-      seed += skipper;
+      seed += 1;
       lowestLocation = Math.min(lowestLocation, value);
       currentLowest = Math.min(currentLowest, value);
       // console.log("Seed:", seed, "Location:", value);
