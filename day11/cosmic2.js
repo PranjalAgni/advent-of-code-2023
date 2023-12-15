@@ -1,41 +1,43 @@
 const path = require("path");
 const { readInput, convertInputToList } = require("../utils/data");
 
-function transposeMatrix(matrix) {
-  return matrix[0].map((_, col) => matrix.map((row) => row[col]));
-}
-
-function twicifyRow(matrix) {
+function emptySpaces(matrix) {
   const rows = matrix.length;
   const cols = matrix[0].length;
-  const expandedMatrix = [];
+  const horizontal = [];
+  const vertical = [];
   for (let row = 0; row < rows; row++) {
-    let newRow = [];
     let isGalaxyPresent = false;
     for (let col = 0; col < cols; col++) {
-      newRow.push(matrix[row][col]);
       if (matrix[row][col] === "#") {
         isGalaxyPresent = true;
+        break;
       }
     }
 
     if (!isGalaxyPresent) {
-      expandedMatrix.push(newRow);
+      horizontal.push(row);
     }
-
-    expandedMatrix.push(newRow);
   }
 
-  return expandedMatrix;
-}
+  for (let col = 0; col < cols; col++) {
+    let isGalaxyPresent = false;
+    for (let row = 0; row < rows; row++) {
+      if (matrix[row][col] === "#") {
+        isGalaxyPresent = true;
+        break;
+      }
+    }
 
-function expandMatrix(inputData) {
-  // row level expansion
-  const horizontal = twicifyRow(inputData);
-  const transposed = transposeMatrix(horizontal);
-  const vertical = twicifyRow(transposed);
-  const expanded = transposeMatrix(vertical);
-  return expanded;
+    if (!isGalaxyPresent) {
+      vertical.push(col);
+    }
+  }
+
+  return {
+    horizontal,
+    vertical,
+  };
 }
 
 function getGalaxies(matrix) {
@@ -57,23 +59,32 @@ function getGalaxies(matrix) {
 }
 
 function expandAndFindShortestPath(inputData) {
-  const expandedMatrix = expandMatrix(inputData);
-  const galaxies = getGalaxies(expandedMatrix);
-  const distances = [];
+  const { horizontal, vertical } = emptySpaces(inputData);
+  const galaxies = getGalaxies(inputData);
+  let total = 0;
   for (let idx = 0; idx < galaxies.length; idx++) {
     for (let jdx = idx + 1; jdx < galaxies.length; jdx++) {
       const galaxy1 = galaxies[idx];
       const galaxy2 = galaxies[jdx];
-      distances.push(Math.abs(galaxy1.x - galaxy2.x) + Math.abs(galaxy1.y - galaxy2.y));
+      total += Math.abs(galaxy1.x - galaxy2.x) + Math.abs(galaxy1.y - galaxy2.y);
+      for (const h of horizontal) {
+        if (h >= galaxy1.y && h <= galaxy2.y) {
+          total += 9;
+        }
+      }
+
+      for (const v of vertical) {
+        if (v >= galaxy1.x && v <= galaxy2.x) {
+          total += 9;
+        }
+      }
     }
   }
-  return distances.reduce((acc, curr) => {
-    return acc + curr;
-  }, 0);
+  return total;
 }
 
 (async () => {
-  const INPUT_PATH = path.join(__dirname, "input.txt");
+  const INPUT_PATH = path.join(__dirname, "sample.txt");
   const inputData = convertInputToList(await readInput(INPUT_PATH));
-  console.log("Part 1:", expandAndFindShortestPath(inputData));
+  console.log("Part 2:", expandAndFindShortestPath(inputData));
 })();
