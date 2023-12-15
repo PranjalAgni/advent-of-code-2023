@@ -7,13 +7,7 @@ function emptySpaces(matrix) {
   const horizontal = [];
   const vertical = [];
   for (let row = 0; row < rows; row++) {
-    let isGalaxyPresent = false;
-    for (let col = 0; col < cols; col++) {
-      if (matrix[row][col] === "#") {
-        isGalaxyPresent = true;
-        break;
-      }
-    }
+    const isGalaxyPresent = matrix[row].split("").some((el) => el === "#");
 
     if (!isGalaxyPresent) {
       horizontal.push(row);
@@ -62,20 +56,21 @@ function expandAndFindShortestPath(inputData) {
   const { horizontal, vertical } = emptySpaces(inputData);
   const galaxies = getGalaxies(inputData);
   let total = 0;
+  const factor = 10_000_00;
   for (let idx = 0; idx < galaxies.length; idx++) {
     for (let jdx = idx + 1; jdx < galaxies.length; jdx++) {
       const galaxy1 = galaxies[idx];
       const galaxy2 = galaxies[jdx];
       total += Math.abs(galaxy1.x - galaxy2.x) + Math.abs(galaxy1.y - galaxy2.y);
       for (const h of horizontal) {
-        if (h >= galaxy1.y && h <= galaxy2.y) {
-          total += 9;
+        if (h >= Math.min(galaxy1.x, galaxy2.x) && h < Math.max(galaxy1.x, galaxy2.x)) {
+          total += factor - 1;
         }
       }
 
       for (const v of vertical) {
-        if (v >= galaxy1.x && v <= galaxy2.x) {
-          total += 9;
+        if (v >= Math.min(galaxy1.y, galaxy2.y) && v < Math.max(galaxy1.y, galaxy2.y)) {
+          total += factor - 1;
         }
       }
     }
@@ -84,7 +79,7 @@ function expandAndFindShortestPath(inputData) {
 }
 
 (async () => {
-  const INPUT_PATH = path.join(__dirname, "sample.txt");
+  const INPUT_PATH = path.join(__dirname, "input.txt");
   const inputData = convertInputToList(await readInput(INPUT_PATH));
   console.log("Part 2:", expandAndFindShortestPath(inputData));
 })();
