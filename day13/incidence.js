@@ -20,38 +20,34 @@ function preprocessMatrix(inputData) {
   return matrixes;
 }
 
-function checkRows(matrix, rows, cols) {
-  const ans = [-1, -1];
-  for (let row = 1; row < rows; row++) {
-    let isSame = true;
-    for (let col = 0; col < cols; col++) {
-      if (matrix[row][col] !== matrix[row - 1][col]) {
-        isSame = false;
-        break;
-      }
+function transposeMatrix(matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const transposedMatrix = [];
+  for (let col = 0; col < cols; col++) {
+    const rowList = [];
+    for (let row = 0; row < rows; row++) {
+      rowList.push(matrix[row][col]);
     }
-
-    if (isSame) return [row - 1, row];
+    transposedMatrix.push(rowList);
   }
 
-  return ans;
+  return transposedMatrix;
 }
 
-function checkCols(matrix, rows, cols) {
-  const ans = [-1, -1];
-  for (let col = 1; col < cols; col++) {
-    let isSame = true;
-    for (let row = 0; row < rows; row++) {
-      if (matrix[row][col] !== matrix[row][col - 1]) {
-        isSame = false;
+function checkReflection(matrix) {
+  const reflection = [];
+  for (let r = 1; r < matrix.length; r++) {
+    reflection.push(r);
+    for (let i = r - 1, j = r; i >= 0 && j < matrix.length; i--, j++) {
+      if (matrix[i] !== matrix[j]) {
+        reflection.splice(reflection.length - 1, 1);
         break;
       }
     }
-
-    if (isSame) return [col - 1, col];
   }
 
-  return ans;
+  return reflection;
 }
 
 function findReflection(inputData) {
@@ -59,16 +55,18 @@ function findReflection(inputData) {
   console.log("Matrixes:", matrixes);
   let answer = 0;
   for (const matrix of matrixes) {
-    const rows = matrix.length;
-    const cols = matrix[0].length;
-    const [col1, col2] = checkCols(matrix, rows, cols);
-    console.log("Cols ", col1, col2);
-    if (col1 === -1 && col2 === -1) {
-      const [row1, row2] = checkRows(matrix, rows, cols);
-      console.log(row1, row2);
-      answer += 100 * row1;
-    } else {
-      answer += col1;
+    const rowsOfReflection = checkReflection(matrix);
+    const transposedMatrix = transposeMatrix(matrix);
+    console.log("Transposed: ", transposedMatrix);
+    const colsOfReflection = checkReflection(transposedMatrix);
+    console.log("Rows of reflection:", rowsOfReflection);
+    console.log("Cols of reflection:", colsOfReflection);
+    if (rowsOfReflection.length > 0) {
+      answer += 100 * rowsOfReflection[0];
+    }
+
+    if (colsOfReflection.length > 0) {
+      answer += colsOfReflection[0];
     }
   }
 
