@@ -25,11 +25,11 @@ function transposeMatrix(matrix) {
   const cols = matrix[0].length;
   const transposedMatrix = [];
   for (let col = 0; col < cols; col++) {
-    const rowList = [];
+    let rowStr = "";
     for (let row = 0; row < rows; row++) {
-      rowList.push(matrix[row][col]);
+      rowStr += matrix[row][col];
     }
-    transposedMatrix.push(rowList);
+    transposedMatrix.push(rowStr);
   }
 
   return transposedMatrix;
@@ -52,15 +52,12 @@ function checkReflection(matrix) {
 
 function findReflection(inputData) {
   const matrixes = preprocessMatrix(inputData);
-  console.log("Matrixes:", matrixes);
+  console.log("Matrixes:", matrixes.length);
   let answer = 0;
   for (const matrix of matrixes) {
     const rowsOfReflection = checkReflection(matrix);
     const transposedMatrix = transposeMatrix(matrix);
-    console.log("Transposed: ", transposedMatrix);
     const colsOfReflection = checkReflection(transposedMatrix);
-    console.log("Rows of reflection:", rowsOfReflection);
-    console.log("Cols of reflection:", colsOfReflection);
     if (rowsOfReflection.length > 0) {
       answer += 100 * rowsOfReflection[0];
     }
@@ -74,7 +71,7 @@ function findReflection(inputData) {
 }
 
 (async () => {
-  const INPUT_PATH = path.join(__dirname, "sample.txt");
+  const INPUT_PATH = path.join(__dirname, "input.txt");
   const inputData = convertInputToList(await readInput(INPUT_PATH));
   console.log("Part 1:", findReflection(inputData));
 })();
